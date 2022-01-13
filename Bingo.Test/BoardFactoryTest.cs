@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Xunit;
 
@@ -9,18 +11,33 @@ namespace Bingo.Test
         [Fact]
         public void GivenBoard_WhenGettingRows_ThenRowCountMatchExample()
         {
-            var board = GetBoard();
+            var board = GetBoardAdventOfCode();
             Assert.Equal(5, board.Rows());
         }
         
         [Fact]
         public void GivenBoard_WhenGettingColumns_ThenColumnCountMatchExample()
         {
-            var board = GetBoard();
+            var board = GetBoardAdventOfCode();
             Assert.Equal(5, board.Columns());
         }
 
-        private static Board GetBoard()
+        [Fact]
+        public void Given1Board_WhenPlaying1_ThenTheBoardIsAWinner()
+        {
+            var board = GetBoard("1");
+            Assert.True(board.Winner(new []{1}));
+        }
+
+        private Board GetBoard(string number)
+        {
+            var row = string.Concat(Enumerable.Repeat(number + " ", 5)).Trim()+Environment.NewLine;
+            var board = string.Concat(Enumerable.Repeat(row, 5)).Trim();
+
+            return BoardFactory.FromString(board);
+        }
+
+        private static Board GetBoardAdventOfCode()
         {
             return BoardFactory.FromString(Board5X5);
         }
@@ -83,6 +100,63 @@ namespace Bingo.Test
         public int Columns()
         {
             return _numbers.GetLength(1);
+        }
+
+        public bool Winner(IReadOnlyCollection<int> playedNumbers)
+        {
+            return WinnerInRows(playedNumbers) || WinnerInColumns(playedNumbers);
+        }
+
+        private bool WinnerInColumns(IReadOnlyCollection<int> playedNumbers)
+        {
+            foreach (var column in Enumerable.Range(0, Columns()))
+            {
+                if (IsColumnWinner(column, playedNumbers))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool WinnerInRows(IReadOnlyCollection<int> playedNumbers)
+        {
+            foreach (var row in Enumerable.Range(0, Rows()))
+            {
+                if (IsRowWinner(row, playedNumbers))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsColumnWinner(int column, IReadOnlyCollection<int> playedNumbers)
+        {
+            for (var i = 0; i < Rows(); i++)
+            {
+                if ( ! playedNumbers.Contains(_numbers[i, column]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool IsRowWinner(int row, IReadOnlyCollection<int> playedNumbers)
+        {
+            for (var i = 0; i < Columns(); i++)
+            {
+                if ( ! playedNumbers.Contains(_numbers[row, i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

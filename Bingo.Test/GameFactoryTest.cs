@@ -15,6 +15,26 @@ namespace Bingo.Test
             Assert.Equal(27, game.NumberCaller.Count);
             Assert.Equal(3, game.Boards.Count);
         }
+        
+        [Fact]
+        public void GivenGame_WhenPlayingFirstNumber_ThenGame()
+        {
+            var game = GameFactory.From(Game);
+            PlayRounds(game, 11);
+            
+            // 12'th round makes it a winner
+            game.PlayRound();
+
+            Assert.True(game.HasWinner());
+        }
+
+        private static void PlayRounds(Game game, int rounds)
+        {
+            for (var round = 0; round < rounds; round++)
+            {
+                game.PlayRound();
+            }
+        }
 
         // Example game from Advent of code
         private const string Game = @"7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
@@ -88,10 +108,26 @@ namespace Bingo.Test
         public Game(NumberCaller numberCaller, IReadOnlyCollection<Board> boards)
         {
             NumberCaller = numberCaller;
+            _numbers = numberCaller.GetEnumerator();
             Boards = boards;
         }
 
+        private readonly IEnumerator<int> _numbers;
+        private readonly List<int> _playedNumbers = new();
+
         public NumberCaller NumberCaller { get; }
         public IReadOnlyCollection<Board> Boards { get; }
+
+        public void PlayRound()
+        {
+            _numbers.MoveNext();
+            var number = _numbers.Current;
+            _playedNumbers.Add(number);
+        }
+
+        public bool HasWinner()
+        {
+            return Boards.Any(board => board.Winner(_playedNumbers));
+        }
     }
 }
