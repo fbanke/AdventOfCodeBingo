@@ -158,5 +158,22 @@ namespace Bingo.Test
 
             return true;
         }
+
+        public int Score(IReadOnlyCollection<int> playedNumbers)
+        {
+            var unmarkedNumbers = new List<int>();
+            foreach (var row in Enumerable.Range(0, Rows()))
+            {
+                foreach (var column in Enumerable.Range(0, Columns()))
+                {
+                    if ( ! playedNumbers.Contains(_numbers[row, column]))
+                    {
+                        unmarkedNumbers.Add(_numbers[row, column]);
+                    }
+                }
+            }
+
+            return unmarkedNumbers.Sum() * playedNumbers.Last();
+        }
     }
 }

@@ -17,7 +17,7 @@ namespace Bingo.Test
         }
         
         [Fact]
-        public void GivenGame_WhenPlayingFirstNumber_ThenGame()
+        public void GivenExampleGame_WhenPlaying11Rounds_ThenGameHasWinner()
         {
             var game = GameFactory.From(Game);
             PlayRounds(game, 11);
@@ -26,6 +26,15 @@ namespace Bingo.Test
             game.PlayRound();
 
             Assert.True(game.HasWinner());
+        }
+
+        [Fact]
+        public void GivenExampleGame_WhenCalculatingScore_ThenItMatchesWithExample()
+        {
+            var game = GameFactory.From(Game);
+            PlayRounds(game, 12);
+            
+            Assert.Equal(4512, game.Score());
         }
 
         private static void PlayRounds(Game game, int rounds)
@@ -128,6 +137,13 @@ namespace Bingo.Test
         public bool HasWinner()
         {
             return Boards.Any(board => board.Winner(_playedNumbers));
+        }
+
+        public int Score()
+        {
+            var board = Boards.First(board => board.Winner(_playedNumbers));
+
+            return board.Score(_playedNumbers);
         }
     }
 }
