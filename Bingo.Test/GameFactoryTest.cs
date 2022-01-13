@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
+﻿using Xunit;
 
 namespace Bingo.Test
 {
@@ -65,85 +62,5 @@ namespace Bingo.Test
 18  8 23 26 20
 22 11 13  6  5
  2  0 12  3  7";
-    }
-
-    public class GameFactory
-    {
-        public static Game From(string gameInput)
-        {
-            var gameParts = GetGameParts(gameInput);
-
-            var numberCaller = NumberCallerFactory.From(GetNumberCallerPart(gameParts));
-            var boards = GetBoards(gameParts);
-
-            return new Game(numberCaller, boards);
-        }
-
-        private static List<Board> GetBoards(IReadOnlyList<string> gameParts)
-        {
-            var boards = new List<Board>();
-            foreach(var board in GetBoardParts(gameParts))
-            {
-                boards.Add(BoardFactory.FromString(board));
-            }
-
-            return boards;
-        }
-
-        private static IEnumerable<string> GetBoardParts(IReadOnlyCollection<string> gameParts)
-        {
-            foreach (var gamePart in gameParts.Skip(GamePartNumberCaller))
-            {
-                yield return gamePart;
-            }
-        }
-
-        private const int GamePartNumberCaller = 1;
-
-        private static string GetNumberCallerPart(string[] gameParts)
-        {
-            return gameParts[0];
-        }
-
-        private static string[] GetGameParts(string game)
-        {
-            return game.Split(new [] { "\r\n\r\n" },
-                StringSplitOptions.RemoveEmptyEntries);
-        }
-    }
-
-    public class Game
-    {
-        public Game(NumberCaller numberCaller, IReadOnlyCollection<Board> boards)
-        {
-            NumberCaller = numberCaller;
-            _numbers = numberCaller.GetEnumerator();
-            Boards = boards;
-        }
-
-        private readonly IEnumerator<int> _numbers;
-        private readonly List<int> _playedNumbers = new();
-
-        public NumberCaller NumberCaller { get; }
-        public IReadOnlyCollection<Board> Boards { get; }
-
-        public void PlayRound()
-        {
-            _numbers.MoveNext();
-            var number = _numbers.Current;
-            _playedNumbers.Add(number);
-        }
-
-        public bool HasWinner()
-        {
-            return Boards.Any(board => board.Winner(_playedNumbers));
-        }
-
-        public int Score()
-        {
-            var board = Boards.First(board => board.Winner(_playedNumbers));
-
-            return board.Score(_playedNumbers);
-        }
     }
 }
