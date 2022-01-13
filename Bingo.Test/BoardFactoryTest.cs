@@ -22,8 +22,7 @@ namespace Bingo.Test
 
         private static Board GetBoard()
         {
-            var board = BoardFactory.FromString(Board5X5);
-            return board;
+            return BoardFactory.FromString(Board5X5);
         }
 
         private const string Board5X5 = @"22 13 17 11  0
@@ -33,7 +32,7 @@ namespace Bingo.Test
  1 12 20 15 19";
     }
 
-    public class BoardFactory
+    public static class BoardFactory
     {
         public static Board FromString(string boardInput)
         {
